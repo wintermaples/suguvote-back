@@ -36,8 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'suguvote.apps.SuguvoteConfig',
     'users',
+    'votes',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -123,3 +126,9 @@ STATIC_URL = '/static/'
 
 
 AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ]
+}
