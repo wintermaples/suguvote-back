@@ -15,7 +15,7 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
             raise AttributeError(f'${self.__class__.__name__} requires request in context!')
 
         request_user = request.user
-        if self.instance is QuerySet:
+        if isinstance(self.instance, QuerySet):
             target_user = self.instance.first()
         else:
             target_user = self.instance

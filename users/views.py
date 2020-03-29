@@ -17,5 +17,4 @@ class UserViewSet(viewsets.ModelViewSet):
             'POST': UserCreateSerializer,
             'PUT': UserUpdateSerializer,
             'PATCH': UserUpdateSerializer,
-            'DELETE': UserRetrieveSerializer
         }[self.request.method]
