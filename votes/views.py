@@ -7,6 +7,7 @@ from votes.models import Vote
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
 
 
+# TODO: Implement permission of deleting.
 class VoteViewSet(viewsets.ModelViewSet):
     queryset = Vote.objects.order_by('-created_at')
 
@@ -14,14 +15,13 @@ class VoteViewSet(viewsets.ModelViewSet):
         return {'request': self.request}
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return VoteRetrieveSerializer
-        elif self.action == 'create':
-            return VoteCreateSerializer
-        elif self.action == 'update':
-            return VoteUpdateSerializer
-
-        return VoteRetrieveSerializer
+        return {
+            'list': VoteRetrieveSerializer,
+            'create': VoteCreateSerializer,
+            'retrieve': VoteRetrieveSerializer,
+            'update': VoteUpdateSerializer,
+            'partial_update': VoteUpdateSerializer,
+        }[self.action]
 
     @action(detail=True, methods=['GET', 'POST'])
     def voting_results(self, request, pk=None):
