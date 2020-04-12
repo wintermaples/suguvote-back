@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import bcrypt
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from suguvote_root.mongodb_connector import MongoDBConnector
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -25,8 +28,13 @@ SECRET_KEY = 'qp_4u!*w4=htnxk$34$)7qamn4jj$ygz+vk9in2th*epo$27o1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '192.168.0.3'
+]
 
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:8080"
+]
 
 # Application definition
 
@@ -36,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'suguvote.apps.SuguvoteConfig',
     'users',
@@ -46,6 +55,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -132,3 +142,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication'
     ]
 }
+
+BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
+
+MONGODB = MongoDBConnector('suguvote').db

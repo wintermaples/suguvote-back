@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "questions": {
+      "oneSelectQuestion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "title", "options"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["ONE_SELECT"]
+          },
+          "title": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_"],
+  "properties": {
+    "_": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/questions/oneSelectQuestion" }
+        ]
+      }
+    }
+  }
+}
