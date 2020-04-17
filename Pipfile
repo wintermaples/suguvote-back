@@ -7,6 +7,12 @@ verify_ssl = true
 
 [packages]
 django = "*"
+django-rest-framework = "*"
+pymongo = "*"
+bcrypt = "*"
+django-cors-headers = "*"
+jsonschema = "*"
+more-itertools = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
