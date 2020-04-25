@@ -142,9 +142,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
-    'MAX_PAGE_SIZE': 100,
+    'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination',
 }
 
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
