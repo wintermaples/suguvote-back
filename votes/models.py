@@ -1,7 +1,7 @@
 import enum
 import json
 import traceback
-from typing import List
+from typing import List, Union
 
 import bcrypt
 import jsonschema
@@ -55,13 +55,13 @@ class Vote(models.Model):
 
     def get_questions(self):
         mongodb: Database = settings.MONGODB
-        questions = mongodb.questions_list.find_one({"_id": ObjectId(self.questions_id)})
+        questions: Union[dict, None] = mongodb.questions_list.find_one({"_id": ObjectId(self.questions_id)})
 
         return questions['_']
 
     def get_voting_results(self):
         mongodb: Database = settings.MONGODB
-        voting_results = mongodb.voting_results_list.find_one({"_id": ObjectId(self.voting_results_id)})
+        voting_results: Union[dict, None] = mongodb.voting_results_list.find_one({"_id": ObjectId(self.voting_results_id)})
 
         return voting_results['_']
 
@@ -101,6 +101,6 @@ def post_delete(sender, instance, **kwargs):
     except:
         traceback.print_exc()
     try:
-        mongodb.voting_results_list.delete_one({'_id': ObjectId(instance.answers_id)})
+        mongodb.voting_results_list.delete_one({'_id': ObjectId(instance.voting_results_id)})
     except:
         traceback.print_exc()
