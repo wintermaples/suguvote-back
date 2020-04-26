@@ -14,6 +14,7 @@ from pymongo.database import Database
 
 from users.models import User
 from votes import voter
+from votes.validators import validate_tags
 from votes.voting_results_of_question_generator import generate_voting_results_of_question
 
 questions_schema = json.loads(open('./votes/questions_schema.json', 'r').read())
@@ -23,8 +24,11 @@ class Vote(models.Model):
     creator = models.ForeignKey(to=User, on_delete=models.PROTECT, null=True, blank=False)
     title = models.CharField(max_length=256, null=False, blank=False)
     password = models.CharField(max_length=60, null=False, blank=False)
+    description = models.TextField(max_length=512, blank=False, null=False)
+    tags = models.CharField(max_length=(settings.MAX_TAG_LENGTH + 1)*settings.MAX_TAG_COUNT, null=False, blank=False, validators=[validate_tags])
     __questions_id = models.CharField(max_length=24, blank=False, null=False, name='questions_id')
     __voting_results_id = models.CharField(max_length=24, blank=False, null=False, name='voting_results_id')
+    closing_at = models.DateTimeField(blank=False, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     updated_at = models.DateTimeField(auto_now_add=True, null=False)
 

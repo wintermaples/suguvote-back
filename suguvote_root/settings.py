@@ -148,3 +148,8 @@ REST_FRAMEWORK = {
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
 
 MONGODB = MongoDBConnector('suguvote').db
+
+
+# Consts.
+MAX_TAG_LENGTH = 12
+MAX_TAG_COUNT = 5
