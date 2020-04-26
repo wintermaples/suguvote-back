@@ -16,6 +16,8 @@ def validate_tags(tags: any):
             raise ValidationError('Tag length is over.')
         if any(map(lambda tag: tag == '', tags)):
             raise ValidationError('Some tag(s) is empty.')
+        if len(tags) != len(set(tags)):
+            raise ValidationError('Tags exist duplication.')
     except ValidationError as ve:
         raise ve
     except:
