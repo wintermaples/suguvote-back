@@ -26,7 +26,8 @@ class VoteRetrieveSerializer(serializers.Serializer):
             'questions': instance.get_questions(),
             'closing_at': instance.closing_at,
             'created_at': instance.created_at,
-            'updated_at': instance.updated_at
+            'updated_at': instance.updated_at,
+            'vote_count': instance.vote_count,
         }
 
 

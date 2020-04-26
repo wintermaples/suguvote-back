@@ -31,6 +31,7 @@ class Vote(models.Model):
     closing_at = models.DateTimeField(blank=False, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=False)
     updated_at = models.DateTimeField(auto_now_add=True, null=False)
+    vote_count = models.IntegerField(null=False, default=0)
 
     def set_password(self, password: str):
         self.password = bcrypt.hashpw(password.encode("UTF-8"), settings.BCRYPT_SALT)
@@ -82,6 +83,7 @@ class Vote(models.Model):
         voting_results = self.get_voting_results()
         voter.vote(voting_results, answers)
         self.update_voting_results(voting_results)
+        self.vote_count += 1
 
     @classmethod
     def validate_questions(cls, questions: List[dict]):
