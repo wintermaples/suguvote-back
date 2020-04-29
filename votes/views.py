@@ -29,11 +29,12 @@ class VoteViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['GET', 'POST'])
     def voting_results(self, request, pk=None):
+        vote: Vote = self.get_object()
         if request.method == 'GET':
-            return Response(self.get_object().get_voting_results())
+            return Response(vote.get_voting_results())
         elif request.method == 'POST':
-            if self.get_object().closing_at and self.get_object().closing_at < datetime.now(timezone.utc):
+            if vote.closing_at and vote.closing_at < datetime.now(timezone.utc):
                 return Response(status=HTTP_400_BAD_REQUEST)
-            self.get_object().vote(request.data['answers'])
-            self.get_object().save()
+            vote.vote(request.data['answers'])
+            vote.save()
             return Response(self.get_object().get_voting_results())
