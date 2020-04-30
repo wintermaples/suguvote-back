@@ -37,6 +37,10 @@ class Vote(models.Model):
         self.password = bcrypt.hashpw(password.encode("UTF-8"), settings.BCRYPT_SALT)
 
     def set_questions(self, questions: List[dict]):
+        '''
+        質問を設定します。既に作成された質問はすべて置き換えられ、今までの質問への回答も上書きされ初期化されます。
+        :param questions: 質問のリスト
+        '''
         mongodb: Database = settings.MONGODB
 
         # 質問のDictを作成
@@ -47,15 +51,19 @@ class Vote(models.Model):
         voting_results_json = {'_': voting_results}
 
         # 質問をデータベースに保存
-        questions_id = mongodb.questions_list.insert_one(
-            questions_json
-        ).inserted_id
+        questions_id = mongodb.questions_list.update_one(
+            {"_id": ObjectId(self.questions_id) if self.questions_id else ObjectId()},
+            {'$set': questions_json},
+            upsert=True
+        ).upserted_id
         self.questions_id = questions_id
 
         # 質問の答えを格納するDictをデータベースに保存
-        voting_results_id = mongodb.voting_results_list.insert_one(
-            voting_results_json
-        ).inserted_id
+        voting_results_id = mongodb.voting_results_list.update_one(
+            {"_id": ObjectId(self.voting_results_id) if self.voting_results_id else ObjectId()},
+            {'$set': voting_results_json},
+            upsert=True
+        ).upserted_id
         self.voting_results_id = voting_results_id
 
     def get_questions(self):
