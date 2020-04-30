@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
+from common.recaptcha import verify_recaptcha
 from votes import voter
 from votes.models import Vote
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
@@ -33,8 +34,16 @@ class VoteViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             return Response(vote.get_voting_results())
         elif request.method == 'POST':
+            data = request.data
+            if 'answers' not in data or 'recaptcha_token' not in data:
+                return Response(status=HTTP_400_BAD_REQUEST)
+
+            if not verify_recaptcha(data['recaptcha_token']):
+                return Response('ReCAPTCHA is failed.', status=HTTP_400_BAD_REQUEST)
+
             if vote.closing_at and vote.closing_at < datetime.now(timezone.utc):
                 return Response(status=HTTP_400_BAD_REQUEST)
+
             vote.vote(request.data['answers'])
             vote.save()
             return Response(self.get_object().get_voting_results())

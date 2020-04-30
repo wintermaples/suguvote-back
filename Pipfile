@@ -14,6 +14,7 @@ django-cors-headers = "*"
 jsonschema = "*"
 more-itertools = "*"
 ipython = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
