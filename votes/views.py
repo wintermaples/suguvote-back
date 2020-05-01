@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
@@ -14,6 +14,8 @@ from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, Vote
 # TODO: Implement permission of deleting.
 class VoteViewSet(viewsets.ModelViewSet):
     queryset = Vote.objects.order_by('-created_at')
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['created_at', 'vote_count']
 
     def get_serializer_context(self):
         return {'request': self.request}
