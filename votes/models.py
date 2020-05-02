@@ -35,7 +35,10 @@ class Vote(models.Model):
     vote_count = models.IntegerField(null=False, default=0)
 
     def set_password(self, password: str):
-        self.password = bcrypt.hashpw(password.encode("UTF-8"), settings.BCRYPT_SALT)
+        self.password = bcrypt.hashpw(password.encode("UTF-8"), settings.BCRYPT_SALT).decode("utf-8")
+
+    def check_password(self, password: str):
+        return bcrypt.checkpw(password.encode("UTF-8"), self.password.encode("UTF-8"))
 
     def set_questions(self, questions: List[dict]):
         '''
