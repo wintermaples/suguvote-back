@@ -32,11 +32,11 @@ class VoteRetrieveSerializer(serializers.Serializer):
 
 
 class VoteCreateSerializer(serializers.Serializer):
-    title = serializers.CharField(allow_null=False, allow_blank=False, required=True)
-    password = serializers.CharField(allow_blank=False, required=False)
-    description = serializers.CharField(allow_null=False, allow_blank=False)
+    title = serializers.CharField(allow_null=False, allow_blank=False, required=True, max_length=256)
+    password = serializers.CharField(allow_blank=False, required=False, max_length=256)
+    description = serializers.CharField(allow_null=False, allow_blank=False, max_length=512)
     tags = serializers.JSONField(allow_null=False, validators=[validate_tags])
-    questions = serializers.JSONField(allow_null=False, required=True)
+    questions = serializers.JSONField(allow_null=False, required=True, validators=[Vote.validate_questions])
     closing_at = serializers.DateTimeField(allow_null=True)
 
     def create(self, validated_data):
@@ -50,9 +50,6 @@ class VoteCreateSerializer(serializers.Serializer):
 
         if (password and creator.is_authenticated) or (not password and not  creator.is_authenticated):
             raise ValidationError('You should specify password when not logged in. Otherwise, you should "NOT" specify password!')
-
-        if not Vote.validate_questions(questions):
-            raise ValidationError('Wrong questions structure.')
 
         vote: Vote = Vote(**validated_data)
         vote.set_questions(questions)
@@ -73,10 +70,10 @@ class VoteCreateSerializer(serializers.Serializer):
 
 
 class VoteUpdateSerializer(serializers.Serializer):
-    title = serializers.CharField(allow_null=False, allow_blank=False, required=True)
-    description = serializers.CharField(allow_null=False, allow_blank=False)
+    title = serializers.CharField(allow_null=False, allow_blank=False, required=True, max_length=256)
+    description = serializers.CharField(allow_null=False, allow_blank=False, max_length=512)
     tags = serializers.JSONField(allow_null=False, validators=[validate_tags])
-    password = serializers.CharField(allow_blank=False, required=False)
+    password = serializers.CharField(allow_blank=False, required=False, max_length=256)
     closing_at = serializers.DateTimeField(allow_null=True)
 
     def create(self, validated_data):
