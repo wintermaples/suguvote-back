@@ -8,6 +8,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from common.recaptcha import verify_recaptcha
 from votes import voter
 from votes.models import Vote
+from votes.permissions import IsMatchedPasswordOrIsOwner
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
 
 
@@ -29,6 +30,12 @@ class VoteViewSet(viewsets.ModelViewSet):
             'partial_update': VoteUpdateSerializer,
         }
         return serializers[self.action] if self.action in serializers else VoteRetrieveSerializer
+
+    def get_permissions(self):
+        permission_classes = []
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsMatchedPasswordOrIsOwner]
+        return [permission() for permission in permission_classes]
 
     @action(detail=True, methods=['GET', 'POST'])
     def voting_results(self, request, pk=None):
