@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from pymongo.database import Database
+from rest_framework.exceptions import ValidationError
 
 from users.models import User
 from votes import voter
@@ -102,9 +103,8 @@ class Vote(models.Model):
                 instance=questions_json,
                 schema=questions_schema
             )
-            return True
         except:
-            return False
+            raise ValidationError('Invalid questions structure.')
 
 
 @receiver(pre_delete, sender=Vote)
