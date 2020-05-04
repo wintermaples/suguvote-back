@@ -15,6 +15,7 @@ jsonschema = "*"
 more-itertools = "*"
 ipython = "*"
 requests = "*"
+django-filter = "*"
 
 [requires]
 python_version = "3.8"
