@@ -13,7 +13,7 @@ class VoteFilter(filters.FilterSet):
 
     def like_filter(self, qs, name, value):
         return qs.filter(
-            Q(title__icontains=value) | Q(description__icontains=value)
+            Q(title__icontains=value) | Q(description__icontains=value) | Q(tags__icontains=value)
         )
 
     class Meta:
