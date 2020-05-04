@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'django_filters',
     'suguvote.apps.SuguvoteConfig',
     'users',
     'votes',

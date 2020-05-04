@@ -1,14 +1,12 @@
 from datetime import datetime, timezone
 
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from common.recaptcha import verify_recaptcha
 from votes import voter
-from votes.filters import VoteFilter
 from votes.models import Vote
 from votes.permissions import IsMatchedPasswordOrIsOwner
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
@@ -17,8 +15,8 @@ from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, Vote
 # TODO: Implement permission of deleting.
 class VoteViewSet(viewsets.ModelViewSet):
     queryset = Vote.objects.order_by('-created_at')
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = VoteFilter
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['created_at', 'vote_count']
 
     def get_serializer_context(self):
         return {'request': self.request}
