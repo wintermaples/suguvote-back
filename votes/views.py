@@ -1,13 +1,13 @@
 from datetime import datetime, timezone
 
-from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
-from rest_framework.exceptions import bad_request
 
+from votes.filters import VoteFilter
 from common.recaptcha import verify_recaptcha, ReCAPTCHAError
-from votes import voter
 from votes.models import Vote
 from votes.permissions import IsMatchedPasswordOrIsOwner
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
@@ -15,8 +15,8 @@ from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, Vote
 
 class VoteViewSet(viewsets.ModelViewSet):
     queryset = Vote.objects.order_by('-created_at')
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['created_at', 'vote_count']
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = VoteFilter
 
     def get_serializer_context(self):
         return {'request': self.request}
