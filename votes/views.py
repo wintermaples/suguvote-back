@@ -4,15 +4,15 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.exceptions import bad_request
 
-from common.recaptcha import verify_recaptcha
+from common.recaptcha import verify_recaptcha, ReCAPTCHAError
 from votes import voter
 from votes.models import Vote
 from votes.permissions import IsMatchedPasswordOrIsOwner
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
 
 
-# TODO: Implement permission of deleting.
 class VoteViewSet(viewsets.ModelViewSet):
     queryset = Vote.objects.order_by('-created_at')
     filter_backends = [filters.OrderingFilter]
@@ -37,6 +37,14 @@ class VoteViewSet(viewsets.ModelViewSet):
             permission_classes = [IsMatchedPasswordOrIsOwner]
         return [permission() for permission in permission_classes]
 
+    def perform_create(self, serializer):
+        data = self.request.data
+        if 'recaptcha_token' not in data:
+            raise ReCAPTCHAError('recaptcha_token is not set.')
+        if not verify_recaptcha(data['recaptcha_token']):
+            raise ReCAPTCHAError('ReCAPTCHA is failed.')
+        return super().perform_create(serializer)
+
     @action(detail=True, methods=['GET', 'POST'])
     def voting_results(self, request, pk=None):
         vote: Vote = self.get_object()
@@ -44,11 +52,13 @@ class VoteViewSet(viewsets.ModelViewSet):
             return Response(vote.get_voting_results())
         elif request.method == 'POST':
             data = request.data
-            if 'answers' not in data or 'recaptcha_token' not in data:
+            if 'answers' not in data:
                 return Response(status=HTTP_400_BAD_REQUEST)
 
+            if 'recaptcha_token' not in data:
+                raise ReCAPTCHAError('recaptcha_token is not set.')
             if not verify_recaptcha(data['recaptcha_token']):
-                return Response('ReCAPTCHA is failed.', status=HTTP_400_BAD_REQUEST)
+                raise ReCAPTCHAError('ReCAPTCHA is failed.')
 
             if vote.closing_at and vote.closing_at < datetime.now(timezone.utc):
                 return Response(status=HTTP_400_BAD_REQUEST)
