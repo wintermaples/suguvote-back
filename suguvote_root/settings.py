@@ -27,16 +27,26 @@ SECRET_KEY = 'qp_4u!*w4=htnxk$34$)7qamn4jj$ygz+vk9in2th*epo$27o1'
 RECAPTCHA_SECRET_KEY = '6LfW6u8UAAAAAJoyN0MeqXiD9Vb-uGul8TIQPCvc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', False)
 
-ALLOWED_HOSTS = [
-    '192.168.0.3',
-    'localhost'
-]
+# ALLOWED_HOSTS
+if DEBUG:
+    ALLOWED_HOSTS = [
+        '*'
+    ]
+else:
+    ALLOWED_HOSTS = [
+        '192.168.0.3',
+        'localhost'
+    ]
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:8080"
-]
+# CORS_ORIGIN
+if DEBUG:
+    CORS_ORIGIN_ALLOW_ALL = True
+else:
+    CORS_ORIGIN_WHITELIST = [
+        "http://localhost:808"
+    ]
 
 # Application definition
 
