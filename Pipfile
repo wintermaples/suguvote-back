@@ -16,6 +16,7 @@ ipython = "*"
 requests = "*"
 django-filter = "*"
 djangorestframework = "*"
+uwsgi = "*"
 
 [requires]
 python_version = "3.8"
