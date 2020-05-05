@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 django = "*"
-django-rest-framework = "*"
 pymongo = "*"
 bcrypt = "*"
 django-cors-headers = "*"
@@ -16,6 +15,7 @@ more-itertools = "*"
 ipython = "*"
 requests = "*"
 django-filter = "*"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.8"
