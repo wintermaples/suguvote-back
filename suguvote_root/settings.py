@@ -45,7 +45,7 @@ if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     CORS_ORIGIN_WHITELIST = [
-        "http://localhost:808"
+        "http://localhost:8080"
     ]
 
 # Application definition
