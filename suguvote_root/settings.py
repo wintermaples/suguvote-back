@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import bcrypt
+from distutils.util import strtobool
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from suguvote_root.mongodb_connector import MongoDBConnector
@@ -22,12 +23,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qp_4u!*w4=htnxk$34$)7qamn4jj$ygz+vk9in2th*epo$27o1'
-RECAPTCHA_SECRET_KEY = '6LfW6u8UAAAAAJoyN0MeqXiD9Vb-uGul8TIQPCvc'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', False)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+if DEBUG:
+    SECRET_KEY = 'qp_4u!*w4=htnxk$34$)7qamn4jj$ygz+vk9in2th*epo$27o1'
+else:
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+
+RECAPTCHA_SECRET_KEY = os.environ.get('DJANGO_RECAPTCHA_SECRET_KEY')
+
 
 # ALLOWED_HOSTS
 if DEBUG:
@@ -46,6 +52,12 @@ else:
     CORS_ORIGIN_WHITELIST = [
         "https://www.suguvote.net"
     ]
+
+# Set session cookie secure
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+else:
+    SESSION_COOKIE_SECURE = True
 
 # Application definition
 
@@ -159,7 +171,16 @@ REST_FRAMEWORK = {
 
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
 
-MONGODB = MongoDBConnector('suguvote').db
+MONGODB_CLIENT =MongoDBConnector(
+    db_name=os.environ.get('MONGODB_SUGUVOTE_DB_NAME', 'suguvote'),
+    db_user=os.environ.get('MONGODB_SUGUVOTE_USERNAME', ''),
+    db_password=os.environ.get('MONGODB_SUGUVOTE_PASSWORD', ''),
+    address=os.environ.get('MONGODB_SUGUVOTE_HOST', 'localhost'),
+    port=os.environ.get('MONGODB_SUGUVOTE_PORT', 27017),
+    using_auth=bool(strtobool(os.environ.get('MONGODB_SUGUVOTE_USING_AUTH', True)))
+)
+
+MONGODB = MONGODB_CLIENT.db
 
 
 # Consts.

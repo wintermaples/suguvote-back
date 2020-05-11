@@ -17,6 +17,7 @@ requests = "*"
 django-filter = "*"
 djangorestframework = "*"
 uwsgi = "*"
+distutils = "*"
 
 [requires]
 python_version = "3.8"
