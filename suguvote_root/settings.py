@@ -36,8 +36,7 @@ if DEBUG:
     ]
 else:
     ALLOWED_HOSTS = [
-        '192.168.0.3',
-        'localhost'
+        'www.suguvote.net'
     ]
 
 # CORS_ORIGIN
@@ -45,7 +44,7 @@ if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
 else:
     CORS_ORIGIN_WHITELIST = [
-        "http://localhost:8080"
+        "https://www.suguvote.net"
     ]
 
 # Application definition
