@@ -32,4 +32,6 @@ class MongoDBConnector():
 
     def connect_and_get_db(self) -> Database:
         client = self.connect()
+        # Check auth
+        client[self.db_name].list_collections()
         return client[self.db_name]
