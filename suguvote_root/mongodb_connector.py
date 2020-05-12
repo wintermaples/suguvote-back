@@ -25,7 +25,7 @@ class MongoDBConnector():
             )
         else:
             client = MongoClient(
-                self.db_name,
+                self.host,
                 self.port
             )
         return client
