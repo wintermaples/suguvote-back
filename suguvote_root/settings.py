@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', False)
+DEBUG = bool(strtobool(os.environ.get('DJANGO_DEBUG', 'False')))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if DEBUG:
@@ -191,6 +191,14 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination',
 }
+if DEBUG:
+    pass
+else:
+    REST_FRAMEWORK.update({
+        'DEFAULT_RENDERER_CLASSES': (
+            'rest_framework.renderers.JSONRenderer',
+        )
+    })
 
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
 
