@@ -1,24 +1,35 @@
 # -*- coding: utf-8 -*-
 from pymongo import MongoClient
+from pymongo.database import Database
 
 
 class MongoDBConnector():
 
-    def __init__(self, db_name, db_user='', db_password: str='', address: str='localhost', port: int=27017, using_auth: bool=True):
-        if using_auth:
-            self.client = MongoClient(
-                address,
-                port,
-                username=db_user,
-                password=db_password,
-                authSource=db_name,
+    def __init__(self, db_name, db_user='', db_password: str= '', host: str= 'localhost', port: int=27017, using_auth: bool=True):
+        self.db_name = db_name
+        self.db_user = db_user
+        self.db_password = db_password
+        self.host = host
+        self.port = port
+        self.using_auth = using_auth
+
+    def connect(self) -> MongoClient:
+        if self.using_auth:
+            client = MongoClient(
+                self.host,
+                self.port,
+                username=self.db_user,
+                password=self.db_password,
+                authSource=self.db_name,
                 authMechanism = 'SCRAM-SHA-256'
             )
         else:
-            self.client = MongoClient(
-                address,
-                port
+            client = MongoClient(
+                self.db_name,
+                self.port
             )
-        self.db = self.client.get_database(db_name)
-        # Fir checking auth.
-        self.db.list_collection_names()
+        return client
+
+    def connect_and_get_db(self) -> Database:
+        client = self.connect()
+        return client[self.db_name]

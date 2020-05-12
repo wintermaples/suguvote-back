@@ -171,17 +171,14 @@ REST_FRAMEWORK = {
 
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
 
-MONGODB_CLIENT =MongoDBConnector(
+MONGODB_CONNECTOR =MongoDBConnector(
     db_name=os.environ.get('MONGODB_SUGUVOTE_DB_NAME', 'suguvote'),
     db_user=os.environ.get('MONGODB_SUGUVOTE_USERNAME', ''),
     db_password=os.environ.get('MONGODB_SUGUVOTE_PASSWORD', ''),
-    address=os.environ.get('MONGODB_SUGUVOTE_HOST', 'localhost'),
+    host=os.environ.get('MONGODB_SUGUVOTE_HOST', 'localhost'),
     port=os.environ.get('MONGODB_SUGUVOTE_PORT', 27017),
-    using_auth=bool(strtobool(os.environ.get('MONGODB_SUGUVOTE_USING_AUTH', True)))
+    using_auth=bool(strtobool(os.environ.get('MONGODB_SUGUVOTE_USING_AUTH', 'True')))
 )
-
-MONGODB = MONGODB_CLIENT.db
-
 
 # Consts.
 MAX_TAG_LENGTH = 12

@@ -45,7 +45,7 @@ class Vote(models.Model):
         質問を設定します。既に作成された質問はすべて置き換えられ、今までの質問への回答も上書きされ初期化されます。
         :param questions: 質問のリスト
         '''
-        mongodb: Database = settings.MONGODB
+        mongodb: Database = settings.MONGODB_CONNECTOR.connect_and_get_db()
 
         # 質問のDictを作成
         questions_json = {'_': questions}
@@ -71,19 +71,19 @@ class Vote(models.Model):
         self.voting_results_id = voting_results_id
 
     def get_questions(self):
-        mongodb: Database = settings.MONGODB
+        mongodb: Database = settings.MONGODB_CONNECTOR.connect_and_get_db()
         questions: Union[dict, None] = mongodb.questions_list.find_one({"_id": ObjectId(self.questions_id)})
 
         return questions['_']
 
     def get_voting_results(self):
-        mongodb: Database = settings.MONGODB
+        mongodb: Database = settings.MONGODB_CONNECTOR.connect_and_get_db()
         voting_results: Union[dict, None] = mongodb.voting_results_list.find_one({"_id": ObjectId(self.voting_results_id)})
 
         return voting_results['_']
 
     def update_voting_results(self, voting_results: List[any]):
-        mongodb: Database = settings.MONGODB
+        mongodb: Database = settings.MONGODB_CONNECTOR.connect_and_get_db()
 
         mongodb.voting_results_list.update_one(
             {"_id": ObjectId(self.voting_results_id)},
@@ -112,7 +112,7 @@ class Vote(models.Model):
 
 @receiver(pre_delete, sender=Vote)
 def post_delete(sender, instance, **kwargs):
-    mongodb: Database = settings.MONGODB
+    mongodb: Database = settings.MONGODB_CONNECTOR.connect_and_get_db()
     try:
         mongodb.questions_list.delete_one({'_id': ObjectId(instance.questions_id)})
     except:
