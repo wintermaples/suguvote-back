@@ -19,6 +19,7 @@ from votes.validators import validate_tags
 from votes.voting_results_of_question_generator import generate_voting_results_of_question
 
 questions_schema = json.loads(open('./votes/questions_schema.json', 'r').read())
+answers_schema = json.loads(open('./votes/answers_schema.json', 'r').read())
 
 
 class Vote(models.Model):
@@ -109,6 +110,17 @@ class Vote(models.Model):
         except:
             raise ValidationError('Invalid questions structure.')
 
+    @classmethod
+    def validate_answers(cls, answers: List[any]):
+        answers_str = str(answers).replace("'", '"')
+        answers_json = json.loads(f'{{"_":{answers_str}}}')
+        try:
+            jsonschema.validate(
+                instance=answers_json,
+                schema=answers_schema
+            )
+        except:
+            raise ValidationError('Invalid answers structure.')
 
 @receiver(pre_delete, sender=Vote)
 def post_delete(sender, instance, **kwargs):
