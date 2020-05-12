@@ -47,11 +47,16 @@ else:
 
 # CORS_ORIGIN
 if DEBUG:
-    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ORIGIN_WHITELIST = [
+        'http://192.168.0.3:8000'
+    ]
 else:
     CORS_ORIGIN_WHITELIST = [
         "https://www.suguvote.net"
     ]
+
+# CORS_ALLOW_CREDENTIALS
+CORS_ALLOW_CREDENTIALS = True
 
 # Set session cookie secure
 if DEBUG:
@@ -108,6 +113,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'suguvote_root.wsgi.application'
 
+# Sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -118,6 +125,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+ATOMIC_REQUESTS = True
 
 
 # Password validation
@@ -159,6 +167,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
+# Caches
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': 'unix:/tmp/memcached.sock',
+        }
+    }
+
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -183,3 +206,4 @@ MONGODB_CONNECTOR =MongoDBConnector(
 # Consts.
 MAX_TAG_LENGTH = 12
 MAX_TAG_COUNT = 5
+SESSION_ID_TAG = 'sess_id'

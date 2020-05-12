@@ -4,8 +4,9 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from common.session import get_or_create_session_id
 from users.serializers import UserRetrieveSerializer
-from votes.models import Vote
+from votes.models import Vote, VotingHistory
 from votes.validators import validate_tags
 
 
@@ -28,6 +29,7 @@ class VoteRetrieveSerializer(serializers.Serializer):
             'created_at': instance.created_at,
             'updated_at': instance.updated_at,
             'vote_count': instance.vote_count,
+            'is_voted_by_you': instance.is_voted_by(self.context['request'])
         }
 
 

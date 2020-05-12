@@ -13,6 +13,7 @@ from django.dispatch import receiver
 from pymongo.database import Database
 from rest_framework.exceptions import ValidationError
 
+from common.session import get_or_create_session_id
 from users.models import User
 from votes import voter
 from votes.validators import validate_tags
@@ -121,6 +122,22 @@ class Vote(models.Model):
             )
         except:
             raise ValidationError('Invalid answers structure.')
+
+    def is_voted_by(self, request):
+        if request.user.is_anonymous:
+            if VotingHistory.objects.filter(vote=self,
+                                            anonymous_user_session_id=get_or_create_session_id(request)).exists():
+                return True
+        else:
+            if VotingHistory.objects.filter(vote=self, user=request.user).exists():
+                return True
+        return False
+
+class VotingHistory(models.Model):
+    vote = models.ForeignKey(to=Vote, on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, on_delete=models.PROTECT, null=True)
+    anonymous_user_session_id = models.CharField(max_length=12, null=True, blank=False)
+
 
 @receiver(pre_delete, sender=Vote)
 def post_delete(sender, instance, **kwargs):
