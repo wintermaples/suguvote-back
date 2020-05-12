@@ -42,7 +42,7 @@ if DEBUG:
     ]
 else:
     ALLOWED_HOSTS = [
-        'www.suguvote.net'
+        'api.suguvote.net'
     ]
 
 # CORS_ORIGIN
