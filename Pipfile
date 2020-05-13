@@ -7,6 +7,18 @@ verify_ssl = true
 
 [packages]
 django = "*"
+pymongo = "*"
+bcrypt = "*"
+django-cors-headers = "*"
+jsonschema = "*"
+more-itertools = "*"
+ipython = "*"
+requests = "*"
+django-filter = "*"
+djangorestframework = "*"
+uwsgi = "*"
+python-memcached = "*"
+mysqlclient = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"

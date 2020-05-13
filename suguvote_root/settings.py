@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import bcrypt
+from distutils.util import strtobool
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from suguvote_root.mongodb_connector import MongoDBConnector
@@ -22,19 +23,46 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qp_4u!*w4=htnxk$34$)7qamn4jj$ygz+vk9in2th*epo$27o1'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(strtobool(os.environ.get('DJANGO_DEBUG', 'False')))
 
-ALLOWED_HOSTS = [
-    '192.168.0.3'
-]
+# SECURITY WARNING: keep the secret key used in production secret!
+if DEBUG:
+    SECRET_KEY = 'qp_4u!*w4=htnxk$34$)7qamn4jj$ygz+vk9in2th*epo$27o1'
+else:
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:8080"
-]
+RECAPTCHA_SECRET_KEY = os.environ.get('DJANGO_RECAPTCHA_SECRET_KEY')
+
+
+# ALLOWED_HOSTS
+if DEBUG:
+    ALLOWED_HOSTS = [
+        '*'
+    ]
+else:
+    ALLOWED_HOSTS = [
+        'api.suguvote.net'
+    ]
+
+# CORS_ORIGIN
+if DEBUG:
+    CORS_ORIGIN_WHITELIST = [
+        'http://192.168.0.3:8000'
+    ]
+else:
+    CORS_ORIGIN_WHITELIST = [
+        "https://www.suguvote.net"
+    ]
+
+# CORS_ALLOW_CREDENTIALS
+CORS_ALLOW_CREDENTIALS = True
+
+# Set session cookie secure
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+else:
+    SESSION_COOKIE_SECURE = True
 
 # Application definition
 
@@ -46,6 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'django_filters',
     'suguvote.apps.SuguvoteConfig',
     'users',
     'votes',
@@ -84,14 +113,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'suguvote_root.wsgi.application'
 
+# Sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MARIADB_SUGUVOTE_DB_NAME', 'suguvote'),
+        'USER': os.environ.get('MARIADB_SUGUVOTE_USERNAME', 'root'),
+        'PASSWORD': os.environ.get('MARIADB_SUGUVOTE_PASSWORD', ''),
+        'HOST': os.environ.get('MARIADB_SUGUVOTE_HOST', 'localhost'),
+        'PORT': os.environ.get('MARIADB_SUGUVOTE_PORT', 3306),
+        'ATOMIC_REQUESTS': True
     }
 }
 
@@ -133,6 +169,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+# Caches
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': 'unix:/tmp/memcached.sock',
+        }
+    }
 
 
 AUTH_USER_MODEL = 'users.User'
@@ -141,11 +193,29 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
-    'MAX_PAGE_SIZE': 100,
+    'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination',
 }
+if DEBUG:
+    pass
+else:
+    REST_FRAMEWORK.update({
+        'DEFAULT_RENDERER_CLASSES': (
+            'rest_framework.renderers.JSONRenderer',
+        )
+    })
 
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
 
-MONGODB = MongoDBConnector('suguvote').db
+MONGODB_CONNECTOR =MongoDBConnector(
+    db_name=os.environ.get('MONGODB_SUGUVOTE_DB_NAME', 'suguvote'),
+    db_user=os.environ.get('MONGODB_SUGUVOTE_USERNAME', ''),
+    db_password=os.environ.get('MONGODB_SUGUVOTE_PASSWORD', ''),
+    host=os.environ.get('MONGODB_SUGUVOTE_HOST', 'localhost'),
+    port=os.environ.get('MONGODB_SUGUVOTE_PORT', 27017),
+    using_auth=bool(strtobool(os.environ.get('MONGODB_SUGUVOTE_USING_AUTH', 'True')))
+)
+
+# Consts.
+MAX_TAG_LENGTH = 12
+MAX_TAG_COUNT = 5
+SESSION_ID_TAG = 'sess_id'
