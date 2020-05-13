@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from typing import List
 
 from more_itertools import first_true
+from rest_framework.exceptions import ValidationError
 
 from votes.question_type import QuestionType
 
@@ -40,7 +41,9 @@ class OneSelectQuestionVoter(Voter):
     def get_question_type(self):
         return QuestionType.ONE_SELECT
 
-    def vote(self, voting_result: dict, answer: any) -> None:
+    def vote(self, voting_result: dict, answer: int) -> None:
+        if len(voting_result['results']) < answer:
+            raise ValidationError('Invalid answers structure.')
         voting_result['results'][answer] = voting_result['results'][answer] + 1
 
 
