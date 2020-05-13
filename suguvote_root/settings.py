@@ -121,11 +121,15 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MARIADB_SUGUVOTE_DB_NAME', 'suguvote'),
+        'USER': os.environ.get('MARIADB_SUGUVOTE_USERNAME', 'root'),
+        'PASSWORD': os.environ.get('MARIADB_SUGUVOTE_PASSWORD', ''),
+        'HOST': os.environ.get('MARIADB_SUGUVOTE_HOST', 'localhost'),
+        'PORT': os.environ.get('MARIADB_SUGUVOTE_PORT', 3306),
+        'ATOMIC_REQUESTS': True
     }
 }
-ATOMIC_REQUESTS = True
 
 
 # Password validation
