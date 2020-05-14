@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('votes', '0007_auto_20200409_1118'),
-        ('votes', '0006_vote_voting_results_id'),
     ]
 
     operations = [

@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', False)
+DEBUG = bool(strtobool(os.environ.get('DJANGO_DEBUG', 'False')))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if DEBUG:
@@ -42,16 +42,21 @@ if DEBUG:
     ]
 else:
     ALLOWED_HOSTS = [
-        'www.suguvote.net'
+        'api.suguvote.net'
     ]
 
 # CORS_ORIGIN
 if DEBUG:
-    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ORIGIN_WHITELIST = [
+        'http://192.168.0.3:8000'
+    ]
 else:
     CORS_ORIGIN_WHITELIST = [
         "https://www.suguvote.net"
     ]
+
+# CORS_ALLOW_CREDENTIALS
+CORS_ALLOW_CREDENTIALS = True
 
 # Set session cookie secure
 if DEBUG:
@@ -108,14 +113,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'suguvote_root.wsgi.application'
 
+# Sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MARIADB_SUGUVOTE_DB_NAME', 'suguvote'),
+        'USER': os.environ.get('MARIADB_SUGUVOTE_USERNAME', 'root'),
+        'PASSWORD': os.environ.get('MARIADB_SUGUVOTE_PASSWORD', ''),
+        'HOST': os.environ.get('MARIADB_SUGUVOTE_HOST', 'localhost'),
+        'PORT': os.environ.get('MARIADB_SUGUVOTE_PORT', 3306),
+        'ATOMIC_REQUESTS': True
     }
 }
 
@@ -159,6 +171,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
+# Caches
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': 'unix:/tmp/memcached.sock',
+        }
+    }
+
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -168,6 +195,14 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination',
 }
+if DEBUG:
+    pass
+else:
+    REST_FRAMEWORK.update({
+        'DEFAULT_RENDERER_CLASSES': (
+            'rest_framework.renderers.JSONRenderer',
+        )
+    })
 
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
 
@@ -183,3 +218,4 @@ MONGODB_CONNECTOR =MongoDBConnector(
 # Consts.
 MAX_TAG_LENGTH = 12
 MAX_TAG_COUNT = 5
+SESSION_ID_TAG = 'sess_id'

@@ -6,9 +6,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from votes.filters import VoteFilter
 from common.recaptcha import verify_recaptcha, ReCAPTCHAError
-from votes.models import Vote
+from common.session import get_or_create_session_id
+from votes.filters import VoteFilter
+from votes.models import Vote, VotingHistory
 from votes.permissions import IsMatchedPasswordOrIsOwner
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
 
@@ -63,6 +64,15 @@ class VoteViewSet(viewsets.ModelViewSet):
             if vote.closing_at and vote.closing_at < datetime.now(timezone.utc):
                 return Response(status=HTTP_400_BAD_REQUEST)
 
+            if vote.is_voted_by(request):
+                return Response(status=HTTP_400_BAD_REQUEST)
+
             vote.vote(request.data['answers'])
             vote.save()
+
+            if request.user.is_anonymous:
+                VotingHistory.objects.create(vote=vote, anonymous_user_session_id=get_or_create_session_id(request))
+            else:
+                VotingHistory.objects.create(vote=vote, user=request.user)
+
             return Response(self.get_object().get_voting_results())

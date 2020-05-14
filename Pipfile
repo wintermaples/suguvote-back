@@ -17,6 +17,8 @@ requests = "*"
 django-filter = "*"
 djangorestframework = "*"
 uwsgi = "*"
+python-memcached = "*"
+mysqlclient = "*"
 
 [requires]
 python_version = "3.8"

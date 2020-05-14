@@ -12,13 +12,19 @@
             "enum": ["ONE_SELECT"]
           },
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
           },
           "options": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "minItems": 2,
+            "maxItems": 10
           }
         }
       }
@@ -34,7 +40,9 @@
         "anyOf": [
           { "$ref": "#/definitions/questions/oneSelectQuestion" }
         ]
-      }
+      },
+      "minItems": 1,
+      "maxItems": 10
     }
   }
 }
