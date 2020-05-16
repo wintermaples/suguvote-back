@@ -49,7 +49,7 @@ class VoteViewSet(viewsets.ModelViewSet):
 
     def get_throttles(self):
         if self.action == 'create':
-            return [CreateVoteThrottle]
+            return [CreateVoteThrottle()]
         return []
 
     @action(detail=True, methods=['GET', 'POST'])
