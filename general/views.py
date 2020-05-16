@@ -18,5 +18,5 @@ def validate_password(request):
     except ValidationError as error:
         return JsonResponse({
             'result': False,
-            'error_message': [error.message for error in error.error_list]
+            'error_messages': [error.message for error in error.error_list]
         })
