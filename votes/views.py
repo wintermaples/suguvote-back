@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, throttle_classes
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
@@ -12,6 +12,7 @@ from votes.filters import VoteFilter
 from votes.models import Vote, VotingHistory
 from votes.permissions import IsMatchedPasswordOrIsOwner
 from votes.serializers import VoteRetrieveSerializer, VoteUpdateSerializer, VoteCreateSerializer
+from votes.throttles import VotingThrottle, CreateVoteThrottle
 
 
 class VoteViewSet(viewsets.ModelViewSet):
@@ -46,7 +47,13 @@ class VoteViewSet(viewsets.ModelViewSet):
             raise ReCAPTCHAError('ReCAPTCHA is failed.')
         return super().perform_create(serializer)
 
+    def get_throttles(self):
+        if self.action == 'create':
+            return [CreateVoteThrottle]
+        return []
+
     @action(detail=True, methods=['GET', 'POST'])
+    @throttle_classes([VotingThrottle])
     def voting_results(self, request, pk=None):
         vote: Vote = self.get_object()
         if request.method == 'GET':

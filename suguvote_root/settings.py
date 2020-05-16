@@ -194,6 +194,14 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication'
     ],
     'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'votes.throttles.VotingThrottle',
+        'votes.throttles.CreateVoteThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'voting': '100/day',
+        'create_vote': '20/day'
+    }
 }
 if DEBUG:
     pass
