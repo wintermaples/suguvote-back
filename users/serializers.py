@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.password_validation import validate_password
 from django.db.models import QuerySet
 from rest_framework import serializers
 
@@ -39,7 +40,7 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
 
 class UserCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
+    password = serializers.CharField(required=True, write_only=True, validators=[validate_password])
     email = serializers.EmailField(required=True)
 
     class Meta:

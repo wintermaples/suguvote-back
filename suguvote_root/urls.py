@@ -27,6 +27,6 @@ router.register(r'votes', VoteViewSet)
 
 urlpatterns = [
     path('auth/', include('authentication.urls')),
-    path('users/', include('users.urls')),
+    path('general/', include('general.urls')),
     path('', include(router.urls))
 ]

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import jsonschema
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -35,7 +36,7 @@ class VoteRetrieveSerializer(serializers.Serializer):
 
 class VoteCreateSerializer(serializers.Serializer):
     title = serializers.CharField(allow_null=False, allow_blank=False, required=True, max_length=256)
-    password = serializers.CharField(allow_blank=False, required=False, max_length=256)
+    password = serializers.CharField(allow_blank=False, required=False, max_length=256, validators=[validate_password])
     description = serializers.CharField(allow_null=False, allow_blank=False, max_length=512)
     tags = serializers.JSONField(allow_null=False, validators=[validate_tags])
     questions = serializers.JSONField(allow_null=False, required=True, validators=[Vote.validate_questions])
@@ -75,7 +76,7 @@ class VoteUpdateSerializer(serializers.Serializer):
     title = serializers.CharField(allow_null=False, allow_blank=False, required=True, max_length=256)
     description = serializers.CharField(allow_null=False, allow_blank=False, max_length=512)
     tags = serializers.JSONField(allow_null=False, validators=[validate_tags])
-    password = serializers.CharField(allow_blank=False, required=False, max_length=256)
+    password = serializers.CharField(allow_blank=False, required=False, max_length=256, validators=[validate_password])
     closing_at = serializers.DateTimeField(allow_null=True)
 
     def create(self, validated_data):

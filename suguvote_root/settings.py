@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'users',
     'votes',
     'authentication',
+    'general',
 ]
 
 MIDDLEWARE = [
