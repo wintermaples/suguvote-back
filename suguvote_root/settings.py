@@ -194,15 +194,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination',
-    'DEFAULT_THROTTLE_CLASSES': [
-        'votes.throttles.VotingThrottle',
-        'votes.throttles.CreateVoteThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'voting': '100/day',
-        'create_vote': '20/day'
-    }
+    'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination'
 }
 if DEBUG:
     pass
@@ -211,6 +203,16 @@ else:
         'DEFAULT_RENDERER_CLASSES': (
             'rest_framework.renderers.JSONRenderer',
         )
+    })
+    REST_FRAMEWORK.update({
+        'DEFAULT_THROTTLE_CLASSES': [
+            'votes.throttles.VotingThrottle',
+            'votes.throttles.CreateVoteThrottle',
+        ],
+        'DEFAULT_THROTTLE_RATES': {
+            'voting': '100/day',
+            'create_vote': '20/day'
+        }
     })
 
 BCRYPT_SALT = bcrypt.gensalt(rounds=12, prefix=b'2a')
