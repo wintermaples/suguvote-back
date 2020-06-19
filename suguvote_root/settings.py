@@ -192,7 +192,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication'
+        'suguvote_root.authentications.CsrfExemptSessionAuthentication'
     ],
     'DEFAULT_PAGINATION_CLASS': 'suguvote_root.pagination.SuguvoteDefaultPagination',
     'DEFAULT_THROTTLE_CLASSES': [
